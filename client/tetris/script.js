@@ -89,4 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
       draw();
     }
   }
+
+  //move the tetromino left, unless it is at the edge or its blocked.
+  function moveLeft() {
+    undraw()
+  }
 });
