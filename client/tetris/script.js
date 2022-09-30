@@ -74,15 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.keyCode === 37) {
       // eslint-disable-next-line no-use-before-define
       moveLeft();
-    } else if (e.keyCode === 38) {
-        //rotate
-    } else if (e.keyCode === 39) {
-        moveRight
-    } else if (ekeyCode === 40) {
-        //moveDown()
-    }
-    }
-
     }
   }
   document.addEventListener('keyup', control);
@@ -120,21 +111,4 @@ document.addEventListener('DOMContentLoaded', () => {
   currentPosition += 1;
 
   draw();
-
-  //move the tetromino right, unless is at the edge or there is a bloackage
-  function moveRight() {
-    undraw()
-    const isAtRightEgdge = current.some(index => (currentPosition + index) % width -1)
-    if (!isAtRightEgdge) currentPosition +=1
-
-    if(current.some((index) => squares[currentPosition + index].classList.contains('taken'))) {
-        currentPosition -=1
-
-    }
-    
-    draw()
-
-
-    
-}
 });
