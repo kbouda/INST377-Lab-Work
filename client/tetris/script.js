@@ -74,6 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.keyCode === 37) {
       // eslint-disable-next-line no-use-before-define
       moveLeft();
+    } else if (e.keyCode) === 38 {
+        rotate()
+    } else if (e.keyCode === 39) {
+        moveRight()
+    } else if (e.keyCode === 40) {
+        moveDown()
     }
   }
   document.addEventListener('keyup', control);
@@ -106,9 +112,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!isAtLeftEgdge) currentPosition -= 1;
 
-    if (current.some((index) => squares[currentPosition + index].classList.contains('taken'))) { currentPosition += 1; }
+    if (current.some((index) => squares[currentPosition + index].classList.contains('taken'))) { 
+        currentPosition += 1; 
+    }
+    draw();
   }
-  currentPosition += 1;
 
-  draw();
+//move tetromino right and block when at edge
+  function moveRight() {
+    undraw()
+    const isAtRightEgdge = current.some(index => (currentPosition + index) % width === width -1)
+
+    if(!isAtRightEgdge) currentPosition +=1
+
+    if(current.some(index => squares[currentPosition + index].classList.contains('taken'))) {
+        currentPosition -=1
+    }
+
+    draw()
+}
+
+//rotating the tetromino
+function rotate() {
+    undraw()
+    currentPosition ++
+    if(currentRotation === current.length) {
+        currentRotation = 0
+    }
+    current = theTetrominoes[random][currentRotation]
+    draw()
+}
+
+
+
+
+
+
+
+
+
 });
