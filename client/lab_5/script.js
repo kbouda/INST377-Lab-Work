@@ -1,3 +1,5 @@
+/* eslint-disable no-template-curly-in-string */
+/* eslint-disable no-unused-vars */
 /* eslint-disable max-len */
 /*
   Hook this script to index.html
@@ -36,7 +38,9 @@ async function mainEvent() { // the async keyword means we can make API requests
       // It does not include any of your form values, though
     */
 
-    const results = await fetch('/api/foodServicePG');
+    // const results = await fetch('/api/foodServicePG');
+    const fetchQuery = new URLSearchParams(formProps);
+    const results = await fetch(`/api/foodServicePG?${fetchQuery}`);
     /*
    ## Get request with query parameters
 
