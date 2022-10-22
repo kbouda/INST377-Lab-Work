@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-unused-vars */
 /* eslint-disable max-len */
 
@@ -11,9 +13,24 @@
     Under this comment place any utility functions you need - like an inclusive random number selector
     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 */
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1) + min);
 
-function injectHTML(list) {
-  console.log('fired injectHTML');
+  function injectHTML(list) {
+    console.log('fired injectHTML');
+    const target = document.querySelector('#restaurant_list');
+    target.innerHTML = '';
+
+    const listEl = document.createElement('ol');
+    target.appendChild(listEl);
+    list.forEach((item) => {
+      const el = document.createElement('li');
+      el.innerText = item.name;
+      listEl.appendChild;
+    });
+
   /*
   ## JS and HTML Injection
     There are a bunch of methods to inject text or HTML into a document using JS
@@ -28,10 +45,17 @@ function injectHTML(list) {
     - using a .forEach method, inject a list element into your index.html for every element in the list
     - Display the name of that restaurant and what category of food it is
 */
-}
+  }
 
-function processRestaurants(list) {
-  console.log('fired restaurants list');
+  function processRestaurants(list) {
+    console.log('fired restaurants list');
+    const range = [...Array(15).keys()];
+    const newArray = range.map((item) => {
+      const index = getRandomIntInclusive(0, list.length);
+      return list[index];
+    });
+    return newArray;
+  }
 
   /*
     ## Process Data Separately From Injecting It
@@ -75,7 +99,6 @@ async function mainEvent() {
   const results = await fetch('/api/foodServicePG');
   const arrayFromJson = await results.json(); // here is where we get the data from our request as JSON
 
-
   /*
     Below this comment, we log out a table of all the results using "dot notation"
     An alternate notation would be "bracket notation" - arrayFromJson["data"]
@@ -106,6 +129,7 @@ async function mainEvent() {
 
       // This constant will have the value of your 15-restaurant collection when it processes
       const restaurantList = processRestaurants(arrayFromJson.data);
+      console.log(restaurantList);
 
       // And this function call will perform the "side effect" of injecting the HTML list for you
       injectHTML(restaurantList);
