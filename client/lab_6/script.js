@@ -16,20 +16,21 @@
 function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1) + min);
+  return Math.floor(Math.random() * (max - min + 1) + min); // The maximum is inclusive and the minimum is inclusive
+}
 
-  function injectHTML(list) {
-    console.log('fired injectHTML');
-    const target = document.querySelector('#restaurant_list');
-    target.innerHTML = '';
+function injectHTML(list) {
+  console.log('fired injectHTML');
+  const target = document.querySelector('#restaurant_list');
+  target.innerHTML = '';
 
-    const listEl = document.createElement('ol');
-    target.appendChild(listEl);
-    list.forEach((item) => {
-      const el = document.createElement('li');
-      el.innerText = item.name;
-      listEl.appendChild;
-    });
+  const listEl = document.createElement('ol');
+  target.appendChild(listEl);
+  list.forEach((item) => {
+    const el = document.createElement('li');
+    el.innerText = item.name;
+    listEl.appendChild(el);
+  });
 
   /*
   ## JS and HTML Injection
@@ -45,30 +46,25 @@ function getRandomIntInclusive(min, max) {
     - using a .forEach method, inject a list element into your index.html for every element in the list
     - Display the name of that restaurant and what category of food it is
 */
-  }
+}
 
-  function processRestaurants(list) {
-    console.log('fired restaurants list');
-    const range = [...Array(15).keys()];
-    const newArray = range.map((item) => {
-      const index = getRandomIntInclusive(0, list.length);
-      return list[index];
-    });
-    return newArray;
-  }
-
+function processRestaurants(list) {
+  console.log('fired restaurants list');
+  const range = [...Array(15).keys()];
+  const newArray = range.map((item) => { 
+    const index = getRandomIntInclusive(0, list.length);
+    return list[index];
+  });
+  return newArray;
   /*
     ## Process Data Separately From Injecting It
       This function should accept your 1,000 records
       then select 15 random records
       and return an object containing only the restaurant's name, category, and geocoded location
       So we can inject them using the HTML injection function
-
       You can find the column names by carefully looking at your single returned record
       https://data.princegeorgescountymd.gov/Health/Food-Inspection/umjn-t2iz
-
     ## What to do in this function:
-
     - Create an array of 15 empty elements (there are a lot of fun ways to do this, and also very basic ways)
     - using a .map function on that range,
     - Make a list of 15 random restaurants from your list of 100 from your data request
@@ -88,7 +84,7 @@ async function mainEvent() {
   // the async keyword means we can make API requests
   const form = document.querySelector('.main_form'); // get your main form so you can do JS with it
   const submit = document.querySelector('#get-resto'); // get a reference to your submit button
-  const loadAnimation = document.querySelector('.lds-ellipsis');
+  const loadAnimation = document.querySelector('.lds-ellipsis'); // get a reference for our loading animation
   submit.style.display = 'none'; // let your submit button disappear
 
   /*
@@ -118,9 +114,10 @@ async function mainEvent() {
   if (arrayFromJson.data?.length > 0) { // the question mark in this means "if this is set at all"
     submit.style.display = 'block'; // let's turn the submit button back on by setting it to display as a block when we have data available
 
-    // hide loading animation now that data is loaded
+    // turns off the load button
     loadAnimation.classList.remove('lds-ellipsis');
     loadAnimation.classList.add('lds-ellipsis_hidden');
+
     // And here's an eventListener! It's listening for a "submit" button specifically being clicked
     // this is a synchronous event event, because we already did our async request above, and waited for it to resolve
     form.addEventListener('submit', (submitEvent) => {
