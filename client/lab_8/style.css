@@ -317,6 +317,16 @@
         align-items: center;
       }
   }
+/* MAP STYLES */
+  
+
+  #map{
+      display: block;
+      width: 400px;
+      height: 380px;
+      border: 2px dashed rgb(12, 12, 12);
+      margin-bottom: 1rem;
+  }
   
   .lds-ellipsis {
       display: inline-block;
