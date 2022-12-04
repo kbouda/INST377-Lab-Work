@@ -1,14 +1,4 @@
-/* eslint-disable no-use-before-define */
-/* eslint-disable no-unreachable */
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-unused-vars */
 /* eslint-disable max-len */
-
-/*
-  Hook this script to index.html
-  by adding `<script src="script.js">` just before your closing `</body>` tag
-*/
 
 /*
   ## Utility Functions
@@ -33,19 +23,10 @@ function injectHTML(list) {
     el.innerText = item.name;
     listEl.appendChild(el);
   });
-
   /*
-    ## JS and HTML Injection
-      There are a bunch of methods to inject text or HTML into a document using JS
-      Mainly, they're considered "unsafe" because they can spoof a page pretty easily
-      But they're useful for starting to understand how websites work
-      the usual ones are element.innerText and element.innerHTML
-      Here's an article on the differences if you want to know more:
-      https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent#differences_from_innertext
-
     ## What to do in this function
       - Accept a list of restaurant objects
-      - using a .forEach method, inject a list element into your index.html for every element in the list
+      - using a .forEach method, inject list element into your index.html for every element in the list
       - Display the name of that restaurant and what category of food it is
   */
 }
@@ -75,18 +56,18 @@ function processRestaurants(list) {
     */
 }
 
-function filterList(array, filterInputValue) {
-  return array.filter((item) => {
+function filterList(list, filterInputValue) {
+  return list.filter((item) => {
+    if (!item.name) { return; }
     const lowerCaseName = item.name.toLowerCase();
     const lowerCaseQuery = filterInputValue.toLowerCase();
-    // eslint-disable-next-line consistent-return
     return lowerCaseName.includes(lowerCaseQuery);
   });
 }
 
 function initMap() {
   console.log('initMap');
-  const map = L.map('map').setView([38.9897, -76.9378], 13);
+  const map = L.map('map').setView([38.97588674535579, -76.91141049206243], 10);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -94,10 +75,22 @@ function initMap() {
   return map;
 }
 
-function markerPLace(array, map) {
-  console.log('markerPlace', array);
-  const marker = L.marker([51.5, -0.09]).addTo(map);
+function markerPlace(array, map) {
+  // const marker = L.marker([51.5, -0.09]).addTo(map);
+  map.eachLayer((layer) => {
+    if (layer instanceof L.Marker) {
+      layer.remove();
+    }
+  });
+  array.forEach((item, index) => {
+    const {coordinates} = item.geocoded_column_1;
+    L.marker([coordinates[1], coordinates[0]]).addTo(map);
+    if (index === 0) {
+      map.setView([coordinates[1], coordinates[0]], 10);
+    }
+  });
 }
+
 async function mainEvent() {
   /*
       ## Main Event
@@ -136,40 +129,40 @@ async function mainEvent() {
   console.log(`${arrayFromJson.data[0].name} ${arrayFromJson.data[0].category}`);
 
   // This IF statement ensures we can't do anything if we don't have information yet
-  if (arrayFromJson.data?.length > 0) { // the question mark in this means "if this is set at all"
-    submit.style.display = 'block'; // let's turn the submit button back on by setting it to display as a block when we have data available
+  if (!arrayFromJson.data?.length) { return; } // the question mark in this means "if this is set at all"
+  submit.style.display = 'block'; // let's turn the submit button back on by setting it to display as a block when we have data available
 
-    loadAnimation.classList.remove('lds-ellipsis');
-    loadAnimation.classList.add('lds-ellipsis_hidden');
+  // turns off the load button
+  loadAnimation.classList.remove('lds-ellipsis');
+  loadAnimation.classList.add('lds-ellipsis_hidden');
 
-    // eslint-disable-next-line prefer-const
-    let currentList = [];
+  let currentList = [];
 
-    form.addEventListener('input', (event) => {
-      console.log(event.target.value);
-      const newFilterList = filterList(arrayFromJson.data, event.target.value);
-      injectHTML(newFilterList);
-    });
+  form.addEventListener('input', (event) => {
+    console.log(event.target.value);
+    const newArray = filterList(currentList, event.target.value);
+    injectHTML(newArray);
+    markerPlace(newArray, pageMap);
+  });
 
-    // And here's an eventListener! It's listening for a "submit" button specifically being clicked
-    // this is a synchronous event event, because we already did our async request above, and waited for it to resolve
-    form.addEventListener('submit', (submitEvent) => {
-      // This is needed to stop our page from changing to a new URL even though it heard a GET request
-      submitEvent.preventDefault();
+  // And here's an eventListener! It's listening for a "submit" button specifically being clicked
+  // this is a synchronous event event, because we already did our async request above, and waited for it to resolve
+  form.addEventListener('submit', (submitEvent) => {
+    // This is needed to stop our page from changing to a new URL even though it heard a GET request
+    submitEvent.preventDefault();
 
-      // This constant will have the value of your 15-restaurant collection when it processes
-      const restaurantList = processRestaurants(arrayFromJson.data);
-      console.log(restaurantList);
+    // This constant will have the value of your 15-restaurant collection when it processes
+    currentList = processRestaurants(arrayFromJson.data);
+    console.log(currentList);
 
-      // And this function call will perform the "side effect" of injecting the HTML list for you
-      injectHTML(restaurantList);
-      markerPLace(currentList, )
+    // And this function call will perform the "side effect" of injecting the HTML list for you
+    injectHTML(currentList);
+    markerPlace(currentList, pageMap);
 
-      // By separating the functions, we open the possibility of regenerating the list
-      // without having to retrieve fresh data every time
-      // We also have access to some form values, so we could filter the list based on name
-    });
-  }
+    // By separating the functions, we open the possibility of regenerating the list
+    // without having to retrieve fresh data every time
+    // We also have access to some form values, so we could filter the list based on name
+  });
 }
 
 /*
