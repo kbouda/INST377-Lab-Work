@@ -18,12 +18,6 @@ function injectHTML(list) {
     el.innerText = item.name;
     listEl.appendChild(el);
   });
-  /*
-  ## What to do in this function
-    - Accept a list of restaurant objects
-    - using a .forEach method, inject list element into your index.html for every element in the list
-    - Display the name of that restaurant and what category of food it is
-*/
 }
 
 function processRestaurants(list) {
@@ -34,21 +28,7 @@ function processRestaurants(list) {
     return list[index];
   });
   return newArray;
-  /*
-    ## Process Data Separately From Injecting It
-      This function should accept your 1,000 records
-      then select 15 random records
-      and return an object containing only the restaurant's name, category, and geocoded location
-      So we can inject them using the HTML injection function
-      You can find the column names by carefully looking at your single returned record
-      https://data.princegeorgescountymd.gov/Health/Food-Inspection/umjn-t2iz
-    ## What to do in this function:
-    - Create an array of 15 empty elements (there are a lot of fun ways to do this, and also very basic ways)
-    - using a .map function on that range,
-    - Make a list of 15 random restaurants from your list of 100 from your data request
-    - Return only their name, category, and location
-    - Return the new list of 15 restaurants so we can work on it separately in the HTML injector
-  */
+
 }
 
 function filterList(list, filterInputValue) {
@@ -61,13 +41,6 @@ function filterList(list, filterInputValue) {
 }
 
 async function mainEvent() {
-  /*
-    ## Main Event
-      Separating your main programming from your side functions will help you organize your thoughts
-      When you're not working in a heavily-commented "learning" file, this also is more legible
-      If you separate your work, when one piece is complete, you can save it and trust it
-  */
-
   // the async keyword means we can make API requests
   const form = document.querySelector('.main_form'); // get your main form so you can do JS with it
   const submit = document.querySelector('#get-resto'); // get a reference to your submit button

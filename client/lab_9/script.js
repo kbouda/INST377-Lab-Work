@@ -1,9 +1,7 @@
-
 function getRandomIntInclusive(min, max) {
-  // eslint-disable-next-line no-param-reassign
   const newMin = Math.ceil(min);
   const newMax = Math.floor(max);
-  return Math.floor(Math.random() * (newMax - newMin + 1) + newMin); // The maximum is inclusive and the minimum is inclusive
+  return Math.floor(Math.random() * (newMax - newMin + 1) + newMin); 
 }
 
 function injectHTML(list) {
@@ -66,68 +64,111 @@ function markerPlace(array, map) {
   });
 }
 
-async function mainEvent() {
+function initChart(targetElement, dataObject) {
+  const labels = Object.keys(dataObject);
+  const info = Object.keys(dataObject).map((item) => dataObject[item].length);
 
-  const pageMap = initMap();
+  const data = {
+    labels: labels,
+    datasets: [{
+      label: 'Restaurants By Category',
+      backgroundColor: 'rgb(255, 99, 132)',
+      borderColor: 'rgb(255, 99, 132)',
+      data: info
+    }]
+  };
+  const config = {
+    type: 'bar',
+    data: data,
+    options: {}
+  };
+
+  return new Chart(
+    targetElement,
+    config
+  );
+}
+
+function changeChart(chart, dataObject) {
+  const labels = Object.keys(dataObject);
+  const info = Object.keys(dataObject).map((item) => dataObject[item].length);
+
+  chart.data.labels = labels;
+  chart.data.datasets.forEach((set) => {
+    set.data = info;
+    return set;
+  })
+  chart.update();
+}
+
+function shapeDataForLineChart(array) {
+  return array.reduce((collection, item) => {
+    if(!collection[item.category]) {
+      collection[item.category] = [item]
+    } else {
+      collection[item.category].push(item);
+    }
+    return collection;
+  }, {});
+}
+
+async function getData() {
+  const url = 'https://data.princegeorgescountymd.gov/resource/umjn-t2iz.json';
+  const data = await fetch(url); // We're using a library that mimics a browser 'fetch' for simplicity
+  const json = await data.json(); // the data isn't json until we access it using dot notation
+  const reply = json.filter((item) => Boolean(item.geocoded_column_1)).filter((item) => Boolean(item.name));
+
+  return reply;
+}
+
+async function mainEvent() {
+  // const pageMap = initMap();
   // the async keyword means we can make API requests
   const form = document.querySelector('.main_form'); // get your main form so you can do JS with it
   const submit = document.querySelector('#get-resto'); // get a reference to your submit button
   const loadAnimation = document.querySelector('.lds-ellipsis'); // get a reference for our loading animation
+  // const restoName = document.querySelector('#resto');
+  const chartTarget = document.querySelector('#myChart');
   submit.style.display = 'none'; // let your submit button disappear
 
-  /*
-      Let's get some data from the API - it will take a second or two to load
-      This next line goes to the request for 'GET' in the file at /server/routes/foodServiceRoutes.js
-      It's at about line 27 - go have a look and see what we're retrieving and sending back.
-     */
-  const results = await fetch('/api/foodServicePG');
-  const arrayFromJson = await results.json(); // here is where we get the data from our request as JSON
-
-  /*
-      Below this comment, we log out a table of all the results using "dot notation"
-      An alternate notation would be "bracket notation" - arrayFromJson["data"]
-      Dot notation is preferred in JS unless you have a good reason to use brackets
-      The 'data' key, which we set at line 38 in foodServiceRoutes.js, contains all 1,000 records we need
-    */
-  console.table(arrayFromJson.data);
-
-  // in your browser console, try expanding this object to see what fields are available to work with
-  // for example: arrayFromJson.data[0].name, etc
-  console.log(arrayFromJson.data[0]);
-
-  // this is called "string interpolation" and is how we build large text blocks with variables
-  console.log(`${arrayFromJson.data[0].name} ${arrayFromJson.data[0].category}`);
-
+  /* API data request */
+  const chartData = await getData();
+  const shapedData = shapeDataForLineChart(chartData);
+  console.log(shapedData);
+  const myChart = initChart(chartTarget, shapedData);
+ 
   // This IF statement ensures we can't do anything if we don't have information yet
-  if (!arrayFromJson.data?.length) { return; } // the question mark in this means "if this is set at all"
-  submit.style.display = 'block'; // let's turn the submit button back on by setting it to display as a block when we have data available
+  if (chartData?.length > 0) { // the question mark in this means "if this is set at all"
+    submit.style.display = 'block'; // let's turn the submit button back on by setting it to display as a block when we have data available
 
-  // turns off the load button
-  loadAnimation.classList.remove('lds-ellipsis');
-  loadAnimation.classList.add('lds-ellipsis_hidden');
+    // turns off the load button
+    loadAnimation.classList.remove('lds-ellipsis');
+    loadAnimation.classList.add('lds-ellipsis_hidden');
 
-  let currentList = [];
+    let currentList = [];
 
-  form.addEventListener('input', (event) => {
-    console.log(event.target.value);
-    const newArray = filterList(currentList, event.target.value);
-    injectHTML(newArray);
-    markerPlace(newArray, pageMap);
-  });
+    form.addEventListener('input', (event) => {
+      console.log(event.target.value);
+      const newArray = filterList(currentList, event.target.value);
+      injectHTML(newArray);
+      // markerPlace(newArray, pageMap);
+    });
+  }
 
-  // And here's an eventListener! It's listening for a "submit" button specifically being clicked
-  // this is a synchronous event event, because we already did our async request above, and waited for it to resolve
+ 
   form.addEventListener('submit', (submitEvent) => {
     // This is needed to stop our page from changing to a new URL even though it heard a GET request
     submitEvent.preventDefault();
 
     // This constant will have the value of your 15-restaurant collection when it processes
-    currentList = processRestaurants(arrayFromJson.data);
+    currentList = processRestaurants(chartData);
     console.log(currentList);
 
     // And this function call will perform the "side effect" of injecting the HTML list for you
     injectHTML(currentList);
-    markerPlace(currentList, pageMap);
+    const localData = shapeDataForLineChart(currentList);
+    changeChart(myChart, localData);
+    // markerPlace(currentList, pageMap);
 
     // By separating the functions, we open the possibility of regenerating the list
     // without having to retrieve fresh data every time
