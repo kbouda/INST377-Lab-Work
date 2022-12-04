@@ -1,11 +1,6 @@
-/* eslint-disable max-len */
 
-/*
-  ## Utility Functions
-    Under this comment place any utility functions you need - like an inclusive random number selector
-    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
-*/
 function getRandomIntInclusive(min, max) {
+  // eslint-disable-next-line no-param-reassign
   const newMin = Math.ceil(min);
   const newMax = Math.floor(max);
   return Math.floor(Math.random() * (newMax - newMin + 1) + newMin); // The maximum is inclusive and the minimum is inclusive
