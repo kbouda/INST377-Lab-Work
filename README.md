@@ -1,4 +1,5 @@
-[Main site:](https://kbouda.github.io/INST377-Lab-Work/client/lab_7)
+* [lab 7](/lab_7)
+* [lab 8](/lab_8)
 
 # INST377 Lab Support Software
 
